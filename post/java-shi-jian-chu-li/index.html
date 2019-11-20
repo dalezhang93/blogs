@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>java 时间处理 | Coding notes</title>
+<meta name="description" content="温故而知新">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://:dalezhang93.github.io//favicon.ico?v=1574257825734">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://:dalezhang93.github.io//styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://:dalezhang93.github.io/">
+        <img src="https://:dalezhang93.github.io//images/avatar.png?v=1574257825734" class="site-logo">
+        <h1 class="site-title">Coding notes</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      温故而知新
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://:dalezhang93.github.io//atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">java 时间处理</h2>
+            <div class="post-date">2019-11-20</div>
+            
+            <div class="post-content">
+              <h2 id="时间戳">时间戳</h2>
+<p>时间戳是自 1970 年 1 月 1 日（00:00:00 GMT）以来的秒数。它也被称为 Unix 时间戳（Unix Timestamp)<br>
+需要注意的是 java 中的 Timestamp 单位是毫秒数.</p>
+<p>时间戳可以从其他对象中转换过来,对于 Date 对象,实例可以通过方法<code>getTime()</code>;对于 Calendar 对象,<br>
+实例可以通过方法<code>getTimeInMillis()</code>.<br>
+值的注意的是如果要获取当前时间的时间戳,直接使用<code>System.currentTimeMillis()</code>返回时间戳要比其他对象转换要快</p>
+<h2 id="joda-time">joda-time</h2>
+<p>在 java 中我们使用 Date和Calendar 对象处理时间,但是操作起来并不方便,对于简单的应用还可以应对,<br>
+稍微复杂一点的情况就令人抓狂了.使用<code>joda-time</code>之后操作就变得明朗起来了.</p>
+<h3 id="时间格式化">时间格式化</h3>
+<p>在 JDK 中我们使用<code>SimpleDateFormat</code>对象对 Date 进行解析和格式化</p>
+<ol>
+<li>首先 SimpleDateFormat 不是线程安全的,因此意味着在多线程编程中我们需要额外的同步操作</li>
+<li>格式化为字符串,format 方法参数一般是 Date 对象,而对于 Calendar 对象需要先转换为 Date 对象再格式化</li>
+</ol>
+<pre><code>SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;YYYY-MM-DD HH:mm&quot;);
+Calendar cal = Calendar.getInstance();
+String dateString  = dateFormat.format(cal.getTime());
+</code></pre>
+<ol start="3">
+<li>解析时间字符串,但是不能很好的校验时间是否正确,默认是宽松模式使用启发式的方法来解释与此对象的格式不精确匹配的输入,<br>
+即使使用非宽松模式,也会忽略掉不正确的格式.要想校验时间格式是否正确还需借助正则表达式</li>
+</ol>
+<pre><code>SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;YYYY-MM-DD HH:mm&quot;);
+try {
+  // 这种情况下,会忽略到字符'a',依然能够解析成功
+    dateFormat.parse(&quot;2017-10-29 10:1a&quot;);
+} catch (ParseException e) {
+    e.printStackTrace();
+}
+
+try {
+    // 设置为非宽松模式,这种情况下会报错,默认情况下会解析为 11:01
+    dateFormat.setLenient(false);
+    dateFormat.parse(&quot;2017-10-29 10:61&quot;);
+} catch (ParseException e) {
+    e.printStackTrace();
+}
+</code></pre>
+<p>在 joda-time 中,DateTime 对象实例可以直接使用自身的<code>toString()</code>方法转换为字符串,另外也专门提供了<code>DateTimeFormatter</code>对象格式化和解析时间</p>
+<pre><code>DateTimeFormatter formatter = DateTimeFormat.forPattern(&quot;YYYY-MM-DD HH:mm&quot;);
+try {
+    DateTime dateTime = formatter.parseDateTime(&quot;2017-10-29 23:50&quot;);
+    String dateString = dateTime.toString(&quot;HH:mm&quot;);
+    System.out.println(dateString);
+} catch (IllegalArgumentException e){
+    System.out.println(e.getMessage());
+}
+</code></pre>
+<ol>
+<li>无论是使用自身的 toString() 方法,还是使用 DateTimeFormatter 对象都是线程安全的</li>
+<li>使用 DateTime 对象就没有必要使用 Calendar 对象,因此时间解析没有多余的步骤</li>
+<li>校验字符串格式,在解析字符串的时候,不仅是非宽松模式,而且能够正确识别错误的输入</li>
+</ol>
+<pre><code>DateTimeFormatter formatter = DateTimeFormat.forPattern(&quot;YYYY-MM-DD HH:mm&quot;);
+try {
+  // 都能够识别而抛出错误
+    formatter.parseDateTime(&quot;2017-10-29 23:5a&quot;);
+    formatter.parseDateTime(&quot;2017-10-29 23:60&quot;);
+} catch (IllegalArgumentException e){
+    System.out.println(e.getMessage());
+}
+</code></pre>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://:dalezhang93.github.io//tag/fGdpV39KB" class="tag">
+                    java
+                  </a>
+                
+              </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

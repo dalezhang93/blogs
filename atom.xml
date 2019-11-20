@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://:dalezhang93.github.io/</id>
+    <title>Coding notes</title>
+    <updated>2019-11-20T13:50:45.715Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://:dalezhang93.github.io/"/>
+    <link rel="self" href="https://:dalezhang93.github.io//atom.xml"/>
+    <subtitle>温故而知新</subtitle>
+    <logo>https://:dalezhang93.github.io//images/avatar.png</logo>
+    <icon>https://:dalezhang93.github.io//favicon.ico</icon>
+    <rights>All rights reserved 2019, Coding notes</rights>
+    <entry>
+        <title type="html"><![CDATA[java 时间处理]]></title>
+        <id>https://:dalezhang93.github.io//post/java-shi-jian-chu-li</id>
+        <link href="https://:dalezhang93.github.io//post/java-shi-jian-chu-li">
+        </link>
+        <updated>2019-11-20T13:41:04.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="时间戳">时间戳</h2>
+<p>时间戳是自 1970 年 1 月 1 日（00:00:00 GMT）以来的秒数。它也被称为 Unix 时间戳（Unix Timestamp)<br>
+需要注意的是 java 中的 Timestamp 单位是毫秒数.</p>
+<p>时间戳可以从其他对象中转换过来,对于 Date 对象,实例可以通过方法<code>getTime()</code>;对于 Calendar 对象,<br>
+实例可以通过方法<code>getTimeInMillis()</code>.<br>
+值的注意的是如果要获取当前时间的时间戳,直接使用<code>System.currentTimeMillis()</code>返回时间戳要比其他对象转换要快</p>
+<h2 id="joda-time">joda-time</h2>
+<p>在 java 中我们使用 Date和Calendar 对象处理时间,但是操作起来并不方便,对于简单的应用还可以应对,<br>
+稍微复杂一点的情况就令人抓狂了.使用<code>joda-time</code>之后操作就变得明朗起来了.</p>
+<h3 id="时间格式化">时间格式化</h3>
+<p>在 JDK 中我们使用<code>SimpleDateFormat</code>对象对 Date 进行解析和格式化</p>
+<ol>
+<li>首先 SimpleDateFormat 不是线程安全的,因此意味着在多线程编程中我们需要额外的同步操作</li>
+<li>格式化为字符串,format 方法参数一般是 Date 对象,而对于 Calendar 对象需要先转换为 Date 对象再格式化</li>
+</ol>
+<pre><code>SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;YYYY-MM-DD HH:mm&quot;);
+Calendar cal = Calendar.getInstance();
+String dateString  = dateFormat.format(cal.getTime());
+</code></pre>
+<ol start="3">
+<li>解析时间字符串,但是不能很好的校验时间是否正确,默认是宽松模式使用启发式的方法来解释与此对象的格式不精确匹配的输入,<br>
+即使使用非宽松模式,也会忽略掉不正确的格式.要想校验时间格式是否正确还需借助正则表达式</li>
+</ol>
+<pre><code>SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;YYYY-MM-DD HH:mm&quot;);
+try {
+  // 这种情况下,会忽略到字符'a',依然能够解析成功
+    dateFormat.parse(&quot;2017-10-29 10:1a&quot;);
+} catch (ParseException e) {
+    e.printStackTrace();
+}
+
+try {
+    // 设置为非宽松模式,这种情况下会报错,默认情况下会解析为 11:01
+    dateFormat.setLenient(false);
+    dateFormat.parse(&quot;2017-10-29 10:61&quot;);
+} catch (ParseException e) {
+    e.printStackTrace();
+}
+</code></pre>
+<p>在 joda-time 中,DateTime 对象实例可以直接使用自身的<code>toString()</code>方法转换为字符串,另外也专门提供了<code>DateTimeFormatter</code>对象格式化和解析时间</p>
+<pre><code>DateTimeFormatter formatter = DateTimeFormat.forPattern(&quot;YYYY-MM-DD HH:mm&quot;);
+try {
+    DateTime dateTime = formatter.parseDateTime(&quot;2017-10-29 23:50&quot;);
+    String dateString = dateTime.toString(&quot;HH:mm&quot;);
+    System.out.println(dateString);
+} catch (IllegalArgumentException e){
+    System.out.println(e.getMessage());
+}
+</code></pre>
+<ol>
+<li>无论是使用自身的 toString() 方法,还是使用 DateTimeFormatter 对象都是线程安全的</li>
+<li>使用 DateTime 对象就没有必要使用 Calendar 对象,因此时间解析没有多余的步骤</li>
+<li>校验字符串格式,在解析字符串的时候,不仅是非宽松模式,而且能够正确识别错误的输入</li>
+</ol>
+<pre><code>DateTimeFormatter formatter = DateTimeFormat.forPattern(&quot;YYYY-MM-DD HH:mm&quot;);
+try {
+  // 都能够识别而抛出错误
+    formatter.parseDateTime(&quot;2017-10-29 23:5a&quot;);
+    formatter.parseDateTime(&quot;2017-10-29 23:60&quot;);
+} catch (IllegalArgumentException e){
+    System.out.println(e.getMessage());
+}
+</code></pre>
+]]></content>
+    </entry>
+</feed>
