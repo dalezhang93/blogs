@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://:dalezhang93.github.io/</id>
+    <id>https://dalezhang93.github.io/</id>
     <title>Coding notes</title>
-    <updated>2019-11-21T02:22:48.948Z</updated>
+    <updated>2019-11-21T02:28:18.466Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://:dalezhang93.github.io/"/>
-    <link rel="self" href="https://:dalezhang93.github.io//atom.xml"/>
+    <link rel="alternate" href="https://dalezhang93.github.io/"/>
+    <link rel="self" href="https://dalezhang93.github.io//atom.xml"/>
     <subtitle>温故而知新</subtitle>
-    <logo>https://:dalezhang93.github.io//images/avatar.png</logo>
-    <icon>https://:dalezhang93.github.io//favicon.ico</icon>
+    <logo>https://dalezhang93.github.io//images/avatar.png</logo>
+    <icon>https://dalezhang93.github.io//favicon.ico</icon>
     <rights>All rights reserved 2019, Coding notes</rights>
     <entry>
         <title type="html"><![CDATA[java 时间处理]]></title>
-        <id>https://:dalezhang93.github.io//post/java-shi-jian-chu-li</id>
-        <link href="https://:dalezhang93.github.io//post/java-shi-jian-chu-li">
+        <id>https://dalezhang93.github.io//post/java-shi-jian-chu-li</id>
+        <link href="https://dalezhang93.github.io//post/java-shi-jian-chu-li">
         </link>
         <updated>2019-11-20T13:41:04.000Z</updated>
         <content type="html"><![CDATA[<h2 id="时间戳">时间戳</h2>
