@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dalezhang93.github.io/blogs</id>
     <title>Coding notes</title>
-    <updated>2019-11-21T02:36:55.183Z</updated>
+    <updated>2019-11-27T17:14:13.740Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dalezhang93.github.io/blogs"/>
     <link rel="self" href="https://dalezhang93.github.io/blogs/atom.xml"/>
@@ -10,6 +10,27 @@
     <logo>https://dalezhang93.github.io/blogs/images/avatar.png</logo>
     <icon>https://dalezhang93.github.io/blogs/favicon.ico</icon>
     <rights>All rights reserved 2019, Coding notes</rights>
+    <entry>
+        <title type="html"><![CDATA[设置以 # 开头的 git  message]]></title>
+        <id>https://dalezhang93.github.io/blogs/post/she-zhi-yi-kai-tou-de-git-message</id>
+        <link href="https://dalezhang93.github.io/blogs/post/she-zhi-yi-kai-tou-de-git-message">
+        </link>
+        <updated>2019-11-27T17:01:09.000Z</updated>
+        <summary type="html"><![CDATA[<!-- more -->
+<p>修改默认的注释符号，让 <code>#</code> 开头的 message 不被忽略</p>
+]]></summary>
+        <content type="html"><![CDATA[<!-- more -->
+<p>修改默认的注释符号，让 <code>#</code> 开头的 message 不被忽略</p>
+<!-- more -->
+<p>使用<code>git commit -m &quot;message&quot;</code>提交单行信息,当 message 信息为多行的时候，默认情况下会把<code>#</code>开头的行作为注释。包括使用 git rebase 修改 commit 时。</p>
+<pre><code>commit title
+
+# commit body（默认情况下，该行会被忽略掉）
+</code></pre>
+<p>解决办法：<br>
+例如设置注释字符为<code>*</code>: <code>git config core.commentchar = '*'</code>,则以<code>#</code>开头的行不会被注释掉.</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[java 时间处理]]></title>
         <id>https://dalezhang93.github.io/blogs/post/java-shi-jian-chu-li</id>

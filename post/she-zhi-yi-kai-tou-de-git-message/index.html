@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>标签列表 | Coding notes</title>
+<title>设置以 # 开头的 git  message | Coding notes</title>
 <meta name="description" content="温故而知新">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -91,14 +91,47 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="tag-list-title">标签列表</h2>
-          <div class="tags-container">
+          <div class="post-detail">
+            <h2 class="post-title">设置以 # 开头的 git  message</h2>
+            <div class="post-date">2019-11-28</div>
             
-              <a class="tag" href="https://dalezhang93.github.io/blogs/tag/pT6ga1w0M">git</a>
+            <div class="post-content">
+              <!-- more -->
+<p>修改默认的注释符号，让 <code>#</code> 开头的 message 不被忽略</p>
+<!-- more -->
+<p>使用<code>git commit -m &quot;message&quot;</code>提交单行信息,当 message 信息为多行的时候，默认情况下会把<code>#</code>开头的行作为注释。包括使用 git rebase 修改 commit 时。</p>
+<pre><code>commit title
+
+# commit body（默认情况下，该行会被忽略掉）
+</code></pre>
+<p>解决办法：<br>
+例如设置注释字符为<code>*</code>: <code>git config core.commentchar = '*'</code>,则以<code>#</code>开头的行不会被注释掉.</p>
+
+            </div>
             
-              <a class="tag" href="https://dalezhang93.github.io/blogs/tag/fGdpV39KB">java</a>
+              <div class="tag-container">
+                
+                  <a href="https://dalezhang93.github.io/blogs/tag/pT6ga1w0M" class="tag">
+                    git
+                  </a>
+                
+              </div>
             
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dalezhang93.github.io/blogs/post/java-shi-jian-chu-li">
+                  <h3 class="post-title">
+                    java 时间处理
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
           </div>
+
         </div>
       </div>
     </div>
