@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>Coding notes</title>
+<title>docker 安装 oracle18c | Coding notes</title>
 <meta name="description" content="温故而知新">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -91,59 +91,72 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://dalezhang93.github.io/blogs/post/docker-an-zhuang-oracle18c">
-                  <h2 class="post-title">docker 安装 oracle18c</h2>
-                </a>
-                <div class="post-date">
-                  2019-11-28
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
+          <div class="post-detail">
+            <h2 class="post-title">docker 安装 oracle18c</h2>
+            <div class="post-date">2019-11-28</div>
+            
+            <div class="post-content">
+              <h1 id="安装镜像">安装镜像</h1>
+<p><code>docker pull ynraju4/oracle18c</code>  oracle18版本镜像文件有8个G之多，要耐心等待。</p>
+<h1 id="启动容器">启动容器</h1>
+<p><code>docker run -dit --name oracle18c -p 1521:1521 ynraju4/oracle18c</code><br>
+容器名 oracle18c<br>
+映射端口为 1521</p>
+<h1 id="登录容器">登录容器</h1>
+<p>登录容器<code>docker exec -it oracle18c bash</code></p>
+<p>为数据库设置用户密码，进入容器目录下有个写好的脚本，执行<code>./setPassword.sh &lt;your passwd&gt;</code><br>
+打开脚本，可以看到为 SYS，SYSTEM，PDBADMIN 用户设置了密码。</p>
+<p>接下来设置时间分区同宿主机器保持一致，<code>export TZ='Asia/Shanghai'</code></p>
+<p>设置oracle环境变量 ORACLE_SID,执行<code>grep $ORACLE_HOME /etc/oratab | cut -d: -f1</code>得到ORCLCDB，执行<code>export ORACLE_SID=ORCLCDB</code></p>
+<p>为了避免每次登录都得设置环境，但是 docker 环境中没有安装 vi 命令，只好执行以下内容:</p>
+<pre><code>echo &quot;export TZ='Asia/Shanghai'&quot; &gt;&gt; ~/.bashrc
+echo &quot;export ORACLE_SID=ORCLCDB&quot; &gt;&gt; ~/.bashrc
+source ~/.bashrc
+</code></pre>
+<h1 id="登录数据库">登录数据库</h1>
+<pre><code>&lt;!-- 登录数据库 --&gt;
+sqlplus / as sysdab
+
+sql&gt; show pdbs;
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 ORCLPDB1			  READ WRITE NO
+
+&lt;!-- 需要需要指定 PDB --&gt;
+sql&gt; alter session set container=ORCLPDB1;
+Session altered.
+</code></pre>
+<p>剩下的操作就跟其他版本一致，如果不想每次进入数据库指定 PDB，也可以在进入前就指定 PDBNAME <code>sqlplus 用户/密码@ORCLPDB1</code></p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://dalezhang93.github.io/blogs/tag/ctKT2LA_p" class="tag">
+                    docker
+                  </a>
+                
+                  <a href="https://dalezhang93.github.io/blogs/tag/X9_cHEawAS" class="tag">
+                    oracle
+                  </a>
+                
               </div>
-              
-            </article>
-          
-            <article class="post-item">
-              <div class="left">
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
                 <a href="https://dalezhang93.github.io/blogs/post/she-zhi-yi-kai-tou-de-git-message">
-                  <h2 class="post-title">设置以 # 开头的 git  message</h2>
+                  <h3 class="post-title">
+                    设置以 # 开头的 git  message
+                  </h3>
                 </a>
-                <div class="post-date">
-                  2019-11-28
-                </div>
-                <div class="post-abstract">
-                  <!-- more -->
-<p>修改默认的注释符号，让 <code>#</code> 开头的 message 不被忽略</p>
-
-                </div>
               </div>
-              
-            </article>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://dalezhang93.github.io/blogs/post/java-shi-jian-chu-li">
-                  <h2 class="post-title">java 时间处理</h2>
-                </a>
-                <div class="post-date">
-                  2019-11-20
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
+            
 
-          <div class="pagination-container">
-  
-  
-</div>
+            
+
+          </div>
 
         </div>
       </div>

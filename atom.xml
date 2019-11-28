@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dalezhang93.github.io/blogs</id>
     <title>Coding notes</title>
-    <updated>2019-11-27T17:14:38.195Z</updated>
+    <updated>2019-11-28T16:17:48.354Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dalezhang93.github.io/blogs"/>
     <link rel="self" href="https://dalezhang93.github.io/blogs/atom.xml"/>
@@ -10,6 +10,46 @@
     <logo>https://dalezhang93.github.io/blogs/images/avatar.png</logo>
     <icon>https://dalezhang93.github.io/blogs/favicon.ico</icon>
     <rights>All rights reserved 2019, Coding notes</rights>
+    <entry>
+        <title type="html"><![CDATA[docker 安装 oracle18c]]></title>
+        <id>https://dalezhang93.github.io/blogs/post/docker-an-zhuang-oracle18c</id>
+        <link href="https://dalezhang93.github.io/blogs/post/docker-an-zhuang-oracle18c">
+        </link>
+        <updated>2019-11-28T15:12:23.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="安装镜像">安装镜像</h1>
+<p><code>docker pull ynraju4/oracle18c</code>  oracle18版本镜像文件有8个G之多，要耐心等待。</p>
+<h1 id="启动容器">启动容器</h1>
+<p><code>docker run -dit --name oracle18c -p 1521:1521 ynraju4/oracle18c</code><br>
+容器名 oracle18c<br>
+映射端口为 1521</p>
+<h1 id="登录容器">登录容器</h1>
+<p>登录容器<code>docker exec -it oracle18c bash</code></p>
+<p>为数据库设置用户密码，进入容器目录下有个写好的脚本，执行<code>./setPassword.sh &lt;your passwd&gt;</code><br>
+打开脚本，可以看到为 SYS，SYSTEM，PDBADMIN 用户设置了密码。</p>
+<p>接下来设置时间分区同宿主机器保持一致，<code>export TZ='Asia/Shanghai'</code></p>
+<p>设置oracle环境变量 ORACLE_SID,执行<code>grep $ORACLE_HOME /etc/oratab | cut -d: -f1</code>得到ORCLCDB，执行<code>export ORACLE_SID=ORCLCDB</code></p>
+<p>为了避免每次登录都得设置环境，但是 docker 环境中没有安装 vi 命令，只好执行以下内容:</p>
+<pre><code>echo &quot;export TZ='Asia/Shanghai'&quot; &gt;&gt; ~/.bashrc
+echo &quot;export ORACLE_SID=ORCLCDB&quot; &gt;&gt; ~/.bashrc
+source ~/.bashrc
+</code></pre>
+<h1 id="登录数据库">登录数据库</h1>
+<pre><code>&lt;!-- 登录数据库 --&gt;
+sqlplus / as sysdab
+
+sql&gt; show pdbs;
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 ORCLPDB1			  READ WRITE NO
+
+&lt;!-- 需要需要指定 PDB --&gt;
+sql&gt; alter session set container=ORCLPDB1;
+Session altered.
+</code></pre>
+<p>剩下的操作就跟其他版本一致，如果不想每次进入数据库指定 PDB，也可以在进入前就指定 PDBNAME <code>sqlplus 用户/密码@ORCLPDB1</code></p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[设置以 # 开头的 git  message]]></title>
         <id>https://dalezhang93.github.io/blogs/post/she-zhi-yi-kai-tou-de-git-message</id>
