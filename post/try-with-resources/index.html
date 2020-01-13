@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Try-with-resources | Coding notes</title>
+<meta name="description" content="温故而知新">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dalezhang93.github.io/blogs/favicon.ico?v=1578934525204">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://dalezhang93.github.io/blogs/styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dalezhang93.github.io/blogs">
+        <img src="https://dalezhang93.github.io/blogs/images/avatar.png?v=1578934525204" class="site-logo">
+        <h1 class="site-title">Coding notes</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      温故而知新
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://dalezhang93.github.io/blogs/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Try-with-resources</h2>
+            <div class="post-date">2020-01-10</div>
+            
+            <div class="post-content">
+              <p>对于任何资源在使用完毕后都应该关闭，如数据库连接对象，文件流等。在 1.7 之前都是放在 Finally 代码块中关闭的。</p>
+<pre><code>&lt;!-- 1.7之前 --&gt;
+private Connection test1(String jdbcurl, String user, String password){
+    Connection conn = null;
+    try {
+        conn = DriverManager.getConnection(jdbcurl, user,  password);
+    } catch (SQLException e){
+        e.printStackTrace();
+    } finally {
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    return conn;
+}
+</code></pre>
+<p>在这段代码里，业务代码只用中间的<code>conn = DriverManager.getConnection(jdbcurl, user, password);</code>而已，Finally 代码块中不仅有非空判断还要嵌套一层 try catch 因为 close 方法依然可能抛出异常，并且在一个方法内只能返回一个异常。如果存在多个资源，还需要考虑资源之间的关闭顺序，多层嵌套。</p>
+<p>1.8 之后，对于实现了 <code>AutoCloseable</code> 的类将在 <code>close</code> 方法中自动实现关闭资源的功能，减少大量样板代码：</p>
+<pre><code>&lt;!-- 1.8版本 --&gt;
+private Connection test2(String jdbcurl, String user, String password){
+    try (Connection conn = DriverManager.getConnection(jdbcurl, user, password)){
+        return conn;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return null;
+    }
+}
+</code></pre>
+<p>借助在线反编译网站 http://javare.cn/De 反编译后结果：</p>
+<pre><code>private Connection test2(String jdbcurl, String user, String password) {
+    try {
+        Connection e = DriverManager.getConnection(jdbcurl, user, password);
+        Throwable var5 = null;
+
+        Connection var6;
+        try {
+        var6 = e;
+        } catch (Throwable var16) {
+        var5 = var16;
+        throw var16;
+        } finally {
+        if(e != null) {
+            if(var5 != null) {
+                try {
+                    e.close();
+                } catch (Throwable var15) {
+                    var5.addSuppressed(var15);
+                }
+            } else {
+                e.close();
+            }
+        }
+
+        }
+
+        return var6;
+    } catch (SQLException var18) {
+        var18.printStackTrace();
+        return null;
+    }
+}
+</code></pre>
+<ul>
+<li>
+<p>addSuppressed 解决异常缺失问题<br>
+注意到反编译后，对于 finally 代码块中的异常，使用了<code>addSuppressed</code>方法，该方法也是从 1.8开始的，允许在原有的异常后面追加异常，这样就可以不遗漏异常信息了。</p>
+</li>
+<li>
+<p>多个资源关闭顺序<br>
+如果有多个资源，也要注意资源的关闭顺序，关闭的顺序和声明的顺序是相反的。</p>
+</li>
+<li>
+<p>为每个直接持有资源的类单独进行声明，以确保总能调用其 close 方法释放资源<br>
+有时候为了缩写，忽略掉中间对象的声明，但是这种写法不能保证资源一定会被正确关闭。</p>
+</li>
+</ul>
+<pre><code>private static void compress(String input, String output) throws IOException {
+    try (
+            FileInputStream fis = new FileInputStream(input);
+            GZIPOutputStream gos = new GZIPOutputStream(new FileOutputStream(output))
+    ) {
+        byte[] buffer = new byte[4096];
+        int nread = 0;
+        while ((nread = fis.read(buffer)) != -1) {
+            gos.write(buffer, 0, nread);
+        }
+    }
+}
+</code></pre>
+<p>按照实例代码，会先依次调用 GZIPOutputStream 和 FileInputStream 的 close 方法，但是  GZIPOutputStream 的 close 方法中真正要执行 close 方法的是中间对象 FileOutputStream，一旦 finish 方法抛出异常就会产生资源泄露。</p>
+<pre><code>/**
+ * Writes remaining compressed data to the output stream and closes the
+ * underlying stream.
+ * @exception IOException if an I/O error has occurred
+ */
+public void close() throws IOException {
+    if (!closed) {
+        finish();  // 可能抛出异常
+        if (usesDefaultDeflater)
+            def.end();
+        out.close();  // 资源关闭
+        closed = true;
+    }
+}
+</code></pre>
+<p>虽然不一定都会引起资源泄露的问题，但是最佳实践是为每个直接持有资源的类单独进行声明，以确保总能调用其 close 方法释放资源。</p>
+<ul>
+<li>1.9 改进</li>
+</ul>
+<p>如果你已经有一个资源是 final 或等效于 final 变量，无需在 try-with-resources 语句中声明一个新变量。生成的代码更简洁，更清晰。</p>
+<pre><code>private void test3(String jdbcurl, String user, String password, String sql) throws SQLException {
+    Connection conn = DriverManager.getConnection(jdbcurl, user, password);
+    PreparedStatement preparedStatement = conn.prepareStatement(sql);
+    preparedStatement.setFetchSize(100);
+    ResultSet resultSet = preparedStatement.executeQuery();
+    try (conn; preparedStatement; resultSet){
+        resultSet.next();
+        resultSet.getString(1);
+    }
+}
+</code></pre>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://dalezhang93.github.io/blogs/tag/fGdpV39KB" class="tag">
+                    java
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dalezhang93.github.io/blogs/post/docker-an-zhuang-oracle18c">
+                  <h3 class="post-title">
+                    docker 安装 oracle18c
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>
